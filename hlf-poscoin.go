@@ -23,10 +23,6 @@ import (
 	"strconv"
 	"time"
 
-	"hyperledger/cci/appinit"
-	"hyperledger/cci/org/hyperledger/chaincode/example02"
-	"hyperledger/ccs"
-
 	"encoding/json"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
