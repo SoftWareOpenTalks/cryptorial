@@ -211,7 +211,7 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 	if err != nil {
 		return false, err
 	}
-
+	fmt.Println("sup!?")
 	um = nil
 	var temp_tin TransferInStruct
 	temp_tin.Address = param.PartySrc
