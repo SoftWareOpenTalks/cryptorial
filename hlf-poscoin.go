@@ -87,6 +87,9 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface, args []string) ([]byte
 	 11:totalInitialSupply
 	 **/
 
+	fmt.Println("args[0] = %s", args[0])
+
+
 	t.name = args[0]
 	t.symbol = args[1]
 	t.decimals = strconv.Atoi(args[2])
@@ -94,8 +97,8 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface, args []string) ([]byte
 	chainStartTime := strconv.Atoi(args[3])
 	stakeStartTime := strconv.Atoi(args[4])
 	const shortForm = "2006-Jan-02"
-	f, _ = time.Parse(shortForm, chainStartTime)
-	g, _ = time.Parse(shortForm, stakeStartTime)
+	f, _ := time.Parse(shortForm, chainStartTime)
+	g, _ := time.Parse(shortForm, stakeStartTime)
 	t.chainStartTime = f.Unix()
 	t.stakeStartTime = g.Unix()
 
