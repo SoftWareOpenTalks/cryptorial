@@ -164,8 +164,8 @@ func MakePayment(stub shim.ChaincodeStubInterface, args []string) ([]byte, error
 	}
 
 	X, _ := strconv.Atoi(args[2])
-	src, _ = strconv.Atoi(src)
-	dst, _ = strconv.Atoi(dst)
+	src, _ = int64(src)
+	dst, _ = int64(dst)
 	src = src - X
 	dst = dst + X
 	logger.Info("srcAmount = %d, dstAmount = %d\n", src, dst)
@@ -202,7 +202,7 @@ func DeleteAccount(stub shim.ChaincodeStubInterface, args []string) ([]byte, err
 func CheckBalance(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
 
-	val, err := stub.GetState(stub, args[0])
+	val, err := stub.GetState(args[0])
 	if err != nil {
 		return nil, err
 	}
