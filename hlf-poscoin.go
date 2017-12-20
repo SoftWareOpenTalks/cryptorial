@@ -212,7 +212,6 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 		return false, err
 	}
 
-/**
 	um = nil
 	var temp_tin TransferInStruct
 	temp_tin.Address = param.PartySrc
@@ -224,7 +223,6 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 	if err != nil {
 		return false, err
 	}
-	**/
 	stub.PutState(transferinsID.Sum(), um)
 
 	return true, nil
