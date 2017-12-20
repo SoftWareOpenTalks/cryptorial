@@ -141,7 +141,7 @@ func (t *AerialCC) Query(stub shim.ChaincodeStubInterface, function string, args
 	return nil, nil
 }
 
-func (t *AerialCC) increaseTotalSupply(stub shim.ChaincodeStubInterface, reward) ([]byte, error) {
+func (t *AerialCC) increaseTotalSupply(stub shim.ChaincodeStubInterface, reward int) ([]byte, error) {
 	t.totalSupply = t.totalSupply + reward
 	return nil, nil
 }
@@ -163,7 +163,7 @@ func MakePayment(stub shim.ChaincodeStubInterface, args []string) ([]byte, error
 		return nil, err
 	}
 
-	X := strconv.Atoi(args[2])
+	X, _ := strconv.Atoi(args[2])
 	src = src - X
 	dst = dst + X
 	logger.Info("srcAmount = %d, dstAmount = %d\n", src, dst)
