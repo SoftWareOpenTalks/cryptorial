@@ -39,9 +39,9 @@ type AerialCC struct {
 	symbol string
 	decimals int
 
-	chainStartTime int
+	chainStartTime int64
 	chainStartBlockNumber int
-	stakeStartTime int
+	stakeStartTime int64
 	stakeMinAge int
 	stakeMaxAge int
 	maxMineProofOfStake int
@@ -55,7 +55,7 @@ type AerialCC struct {
 type TransferInStruct struct {
 	Address string "json:address"
 	Amount int "json:amount"
-	Time int "json:time"
+	Time int64 "json:time"
 }
 type transferIns []TransferInStruct
 
@@ -221,15 +221,15 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 	st := string(append(string(args[0]),"transferIn"))
 	transferinsID := sha256.New()
 	transferinsID.Write([]byte (st))
-	transferIns, err := stub.GetState(string(transferinsID.Sum(nil)))
+	_transferIns, err := stub.GetState(string(transferinsID.Sum(nil)))
 	var um transferIns
-	err = json.Unmarshal(transferIns, &um)
+	err = json.Unmarshal(_transferIns, &um)
 
 	if err != nil {
 		return false, err
 	}
 
-	if len(transferIns) <= 0 {
+	if len(_transferIns) <= 0 {
 		return false, err
 	}
 
@@ -244,8 +244,9 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 		return false, err
 	}
 
-	src = src + reward
-	err = stub.PutState(args[0], []byte(strconv.Itoa(src)))
+	src_str := strconv.Atoi(string(src))
+	src = []byte(strconv.Itoa(src_str + reward))
+	err = stub.PutState(args[0], src)
 	if err != nil {
 		return false, err
 	}
@@ -269,7 +270,7 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, args []string) (int, bool) {
 
 	now := time.Now().Unix()
-	if now <= t.stakeStartTime || stakeStartTime <= 0 {
+	if now <= t.stakeStartTime || t.stakeStartTime <= 0 {
 		return 0,false
 	}
 
