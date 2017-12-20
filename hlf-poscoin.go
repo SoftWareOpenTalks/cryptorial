@@ -89,7 +89,7 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface, args []string) ([]byte
 
 	fmt.Println("args[0] = %s", args[0])
 
-
+ /**
 	t.name = args[0]
 	t.symbol = args[1]
 	t.decimals = strconv.Atoi(args[2])
@@ -110,7 +110,20 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface, args []string) ([]byte
 	t.totalSupply = strconv.Atoi(args[9])
 	t.maxTotalSupply = strconv.Atoi(args[10])
 	t.totalInitialSupply = strconv.Atoi(args[11])
+**/
 
+	t.name = "cryptorial"
+	t.symbol = "cri"
+	t.decimals = 18
+	//Timings
+
+	t.stakeMinAge = 3*oneDayUnixTime
+	t.stakeMaxAge = 90*oneDayUnixTime
+	t.maxMineProofOfStake = 100000000000000000
+
+	t.totalSupply = 100
+	t.maxTotalSupply = 21000000
+	t.totalInitialSupply = 100
 	logger.Info("Successfully Initialized the AerialCC")
 
 	return nil, nil
