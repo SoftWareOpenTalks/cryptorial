@@ -218,10 +218,10 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 		return false, err
 	}
 
-	st := string(append(args[0],"transferIn"))
+	st := string(append(string(args[0]),"transferIn"))
 	transferinsID := sha256.New()
 	transferinsID.Write([]byte (st))
-	transferIns, err := stub.GetState(transferinsID.Sum(nil))
+	transferIns, err := stub.GetState(string(transferinsID.Sum(nil)))
 	var um transferIns
 	err = json.Unmarshal(transferIns, &um)
 
@@ -238,7 +238,7 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 		return false, err
 	}
 
-	newTS, err := t.increaseTotalSupply(reward)
+	newTS, err := t.increaseTotalSupply(stub, reward)
 	if err != nil {
 		fmt.Printf("IncreaseTotalSupply Failed: %s", err)
 		return false, err
@@ -252,7 +252,7 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 	fmt.Println("sup!?")
 	um = nil
 	var temp_tin TransferInStruct
-	temp_tin.Address = param.PartySrc
+	temp_tin.Address = args[0]
 	temp_tin.Amount = src+reward
 	temp_tin.Time = time.Now().Unix()
 
@@ -261,7 +261,7 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 	if err != nil {
 		return false, err
 	}
-	stub.PutState(transferinsID.Sum(), um)
+	stub.PutState(transferinsID.Sum(nil), um)
 
 	return true, nil
 }
