@@ -31,8 +31,8 @@ import (
 
 var logger = shim.NewLogger("mylogger")
 
-const oneDayUnixTime int = 86400*(10**9)
-const oneYearUnixTime int = 365*86400*(10**9)
+const oneDayUnixTime int = 86400000000000
+const oneYearUnixTime int = 31536000000000000
 
 type AerialCC struct {
 	name string
