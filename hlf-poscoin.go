@@ -57,7 +57,7 @@ type TransferInStruct struct {
 	Amount int "json:amount"
 	Time int "json:time"
 }
-type transferIns []TransferInstruct
+type transferIns []TransferInStruct
 
 
 // Called to initialize the chaincode
