@@ -141,35 +141,40 @@ func (t *AerialCC) Query(stub shim.ChaincodeStubInterface, function string, args
 	return nil, nil
 }
 
+func (t *AerialCC) increaseTotalSupply(stub shim.ChaincodeStubInterface, reward) ([]byte, error) {
+	t.totalSupply = t.totalSupply + reward
+	return nil, nil
+}
+
 // Transaction makes payment of X units from A to B
 func MakePayment(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 
 	var err error
 
-	src, err := stub.GetState(stub, args["partySrc"])
+	src, err := stub.GetState(stub, args[0])
 	if err != nil {
 		logger.Error("partySrc is missing!")
 		return nil, err
 	}
 
-	dst, err := stub.GetState(stub, args["partyDst"])
+	dst, err := stub.GetState(stub, args[1])
 	if err != nil {
 		logger.Error("partyDst is missing!")
 		return nil, err
 	}
 
-	X := int(param.Amount)
+	X := strconv.Atoi(args[2])
 	src = src - X
 	dst = dst + X
 	logger.Info("srcAmount = %d, dstAmount = %d\n", src, dst)
 
-	err = stub.PutState(args["partySrc"], []byte(strconv.Itoa(src)))
+	err = stub.PutState(args[0], []byte(strconv.Itoa(src)))
 	if err != nil {
 		logger.Error("failed to write the state for src!")
 		return nil, err
 	}
 
-	err = stub.PutState(args["partyDst"], []byte(strconv.Itoa(dst)))
+	err = stub.PutState(args[1], []byte(strconv.Itoa(dst)))
 	if err != nil {
 		logger.Error("failed to write the state for dst!")
 		return nil, err
@@ -181,7 +186,7 @@ func MakePayment(stub shim.ChaincodeStubInterface, args []string) ([]byte, error
 // Deletes an entity from state
 func DeleteAccount(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 
-	err := stub.DelState(args["partyID"])
+	err := stub.DelState(args[0])
 	if err != nil {
 		logger.Error("Failed to delete state!")
 		return nil, errors.New("Failed to delete state")
@@ -195,7 +200,7 @@ func DeleteAccount(stub shim.ChaincodeStubInterface, args []string) ([]byte, err
 func CheckBalance(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
 
-	val, err := stub.GetState(stub, args["partyID"])
+	val, err := stub.GetState(stub, args[0])
 	if err != nil {
 		return nil, err
 	}
@@ -206,12 +211,12 @@ func CheckBalance(stub shim.ChaincodeStubInterface, args []string) ([]byte, erro
 func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 
 	//canPoSMint
-	src, err := t.GetState(stub, param.PartySrc)
+	src, err := t.GetState(stub, args[0])
 	if err != nil {
 		return false, err
 	}
 
-	st := string(append(param.PartySrc,"transferIn"))
+	st := string(append(args[0],"transferIn"))
 	transferinsID := sha256.New()
 	transferinsID.Write([]byte (st))
 	transferIns, err := stub.GetState(transferinsID.Sum(nil))
@@ -226,7 +231,7 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 		return false, err
 	}
 
-	reward := t.getProofOfStakeReward(stub, param.PartySrc)
+	reward := t.getProofOfStakeReward(stub, args[0])
 	if reward <= 0 {
 		return false, err
 	}
@@ -238,7 +243,7 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 	}
 
 	src = src + reward
-	err = stub.PutState(param.PartySrc, []byte(strconv.Itoa(src)))
+	err = stub.PutState(args[0], []byte(strconv.Itoa(src)))
 	if err != nil {
 		return false, err
 	}
@@ -266,7 +271,7 @@ func getProofOfStakeReward(stub shim.ChaincodeStubInterface, args []string) (int
 		return 0,false
 	}
 
-	_coinAge = getCoinAge(stub, param, now)
+	_coinAge = getCoinAge(stub, now, args)
 	if _coinAge <= 0 {
 		return 0, false
 	}
@@ -283,9 +288,9 @@ func getProofOfStakeReward(stub shim.ChaincodeStubInterface, args []string) (int
 
 }
 
-func getCoinAge(stub shim.ChaincodeStubInterface, now time, function string, args []string) (int, bool) {
+func getCoinAge(stub shim.ChaincodeStubInterface, now time, args []string) (int, bool) {
 
-	st := string(append(param.PartySrc,"transferIn"))
+	st := string(append(args[0],"transferIn"))
 	transferinsID := sha256.New()
 	transferinsID.Write([]byte (st))
 	transferIns, err := stub.GetState(transferinsID.Sum(nil))
