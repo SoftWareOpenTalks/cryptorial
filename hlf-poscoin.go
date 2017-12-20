@@ -170,13 +170,13 @@ func MakePayment(stub shim.ChaincodeStubInterface, args []string) ([]byte, error
 	dst = []byte(strconv.Itoa(dst_str + X))
 	logger.Info("srcAmount = %d, dstAmount = %d\n", src, dst)
 
-	err = stub.PutState(args[0], []byte(strconv.Itoa(src)))
+	err = stub.PutState(args[0], src)
 	if err != nil {
 		logger.Error("failed to write the state for src!")
 		return nil, err
 	}
 
-	err = stub.PutState(args[1], []byte(strconv.Itoa(dst)))
+	err = stub.PutState(args[1], dst)
 	if err != nil {
 		logger.Error("failed to write the state for dst!")
 		return nil, err
@@ -213,7 +213,7 @@ func CheckBalance(stub shim.ChaincodeStubInterface, args []string) ([]byte, erro
 func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 
 	//canPoSMint
-	src, err := stub.GetState(stub, args[0])
+	src, err := stub.GetState(args[0])
 	if err != nil {
 		return false, err
 	}
@@ -266,7 +266,7 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 	return true, nil
 }
 
-func getProofOfStakeReward(stub shim.ChaincodeStubInterface, args []string) (int, bool) {
+func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, args []string) (int, bool) {
 
 	now := time.Now().Unix()
 	if now <= t.stakeStartTime || stakeStartTime <= 0 {
