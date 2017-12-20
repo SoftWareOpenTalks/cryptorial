@@ -151,19 +151,21 @@ func MakePayment(stub shim.ChaincodeStubInterface, args []string) ([]byte, error
 
 	var err error
 
-	src, err := stub.GetState(stub, args[0])
+	src, err := stub.GetState(args[0])
 	if err != nil {
 		logger.Error("partySrc is missing!")
 		return nil, err
 	}
 
-	dst, err := stub.GetState(stub, args[1])
+	dst, err := stub.GetState(args[1])
 	if err != nil {
 		logger.Error("partyDst is missing!")
 		return nil, err
 	}
 
 	X, _ := strconv.Atoi(args[2])
+	src, _ = strconv.Atoi(src)
+	dst, _ = strconv.Atoi(dst)
 	src = src - X
 	dst = dst + X
 	logger.Info("srcAmount = %d, dstAmount = %d\n", src, dst)
@@ -211,7 +213,7 @@ func CheckBalance(stub shim.ChaincodeStubInterface, args []string) ([]byte, erro
 func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 
 	//canPoSMint
-	src, err := t.GetState(stub, args[0])
+	src, err := stub.GetState(stub, args[0])
 	if err != nil {
 		return false, err
 	}
