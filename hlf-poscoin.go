@@ -213,7 +213,7 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 	}
 
 	um = nil
-	temp_tin := transferInStruct({"Address":param.PartySrc,"Amount":src+reward,"Time":time.Now().Unix()})
+	temp_tin := transferInStruct{Address:param.PartySrc,Amount:src+reward,Time:time.Now().Unix()}
 	um = append(um, temp_tin)
 	um, err = json.Marshal(&um)
 	if err != nil {
