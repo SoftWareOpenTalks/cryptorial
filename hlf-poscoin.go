@@ -69,29 +69,44 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface, args []string) ([]byte
 
 	if len(args) < 12 {
 		logger.Error("Invalid number of arguments")
-		return nil, error.New("Invalid number of arguments")
+		return nil, errors.New("Invalid number of arguments")
 	}
 
-	t.name = args["name"]
-	t.symbol = args["symbol"]
-	t.decimals = int32(args["decimal"])
+	/**
+	 0:name
+	 1:symbol
+	 2:decimals
+	 3:chainstarttime
+	 4:stakestarttime
+	 5:chainStartBlockNumber
+	 6:stakeMinAge
+	 7:stakeMaxAge
+	 8:maxMineProofOfStake
+	 9:totalSupply
+	 10:maxTotalSupply
+	 11:totalInitialSupply
+	 **/
+
+	t.name = args[0]
+	t.symbol = args[1]
+	t.decimals = strconv.Atoi(args[2])
 	//Timings
-	chainStartTime := int32(args["chainStartTime"])
-	stakeStartTime := int32(args["stakeStarttime"])
+	chainStartTime := strconv.Atoi(args[3])
+	stakeStartTime := strconv.Atoi(args[4])
 	const shortForm = "2006-Jan-02"
 	f, _ = time.Parse(shortForm, chainStartTime)
 	g, _ = time.Parse(shortForm, stakeStartTime)
 	t.chainStartTime = f.Unix()
 	t.stakeStartTime = g.Unix()
 
-	t.chainStartBlockNumber = int32(args["chainStartBlockNumber"])
-	t.stakeMinAge = int32(args["stakeMinAge"])*oneDayUnixTime
-	t.stakeMaxAge = int32(args["stakeMaxAge"])*oneDayUnixTime
-	t.maxMineProofOfStake = args["maxMineProofOfStake"]
+	t.chainStartBlockNumber = strconv.Atoi(args[5])
+	t.stakeMinAge = strconv.Atoi(args[6])*oneDayUnixTime
+	t.stakeMaxAge = strconv.Atoi(args[7])*oneDayUnixTime
+	t.maxMineProofOfStake = strconv.Atoi(args[8])
 
-	t.totalSupply = args["totalSupply"]
-	t.maxTotalSupply = args["maxTotalSupply"]
-	t.totalInitialSupply = args["totalInitialSupply"]
+	t.totalSupply = strconv.Atoi(args[9])
+	t.maxTotalSupply = strconv.Atoi(args[10])
+	t.totalInitialSupply = strconv.Atoi(args[11])
 
 	logger.Info("Successfully Initialized the AerialCC")
 
