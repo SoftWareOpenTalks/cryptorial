@@ -270,7 +270,7 @@ func getCoinAge(stub shim.ChaincodeStubInterface, now time, function string, arg
 	}
 
 	var _coinAge int
-	for i := 0, i < len(transferIns); i++ {
+	for i := 0; i < len(transferIns); i++ {
 		if now.Unix() < (transferIns[i].Time + t.stakeMinAge){
 			continue
 		}
