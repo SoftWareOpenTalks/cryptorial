@@ -99,8 +99,8 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface, args []string) ([]byte
 	const shortForm = "2006-Jan-02"
 	f, _ := time.Parse(shortForm, chainStartTime)
 	g, _ := time.Parse(shortForm, stakeStartTime)
-	t.chainStartTime = f.Unix()
-	t.stakeStartTime = g.Unix()
+	t.chainStartTime = int32(f.Unix())
+	t.stakeStartTime = int32(g.Unix())
 
 	t.chainStartBlockNumber = strconv.Atoi(args[5])
 	t.stakeMinAge = strconv.Atoi(args[6])*oneDayUnixTime
