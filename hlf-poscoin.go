@@ -164,8 +164,8 @@ func MakePayment(stub shim.ChaincodeStubInterface, args []string) ([]byte, error
 	}
 
 	X, _ := strconv.Atoi(args[2])
-	src, _ = int64(src)
-	dst, _ = int64(dst)
+	src, _ = strconv.Atoi(string(src))
+	dst, _ = strconv.Atoi(string(dst))
 	src = src - X
 	dst = dst + X
 	logger.Info("srcAmount = %d, dstAmount = %d\n", src, dst)
