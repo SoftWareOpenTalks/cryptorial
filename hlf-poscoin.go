@@ -210,7 +210,7 @@ func CheckBalance(stub shim.ChaincodeStubInterface, args []string) ([]byte, erro
 	return val, nil
 }
 
-func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
+func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 
 	//canPoSMint
 	src, err := stub.GetState(args[0])
@@ -244,7 +244,7 @@ func MinePoS(stub shim.ChaincodeStubInterface, args []string) (bool,error) {
 		return false, err
 	}
 
-	src_str := strconv.Atoi(string(src))
+	src_str, _ := strconv.Atoi(string(src))
 	src = []byte(strconv.Itoa(src_str + reward))
 	err = stub.PutState(args[0], src)
 	if err != nil {
