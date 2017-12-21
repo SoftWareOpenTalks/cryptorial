@@ -218,7 +218,7 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 		return false, err
 	}
 
-	st := string(append(string(args[0]),"transferIn"))
+	st := string(args[0]) + "transferIn"
 	transferinsID := sha256.New()
 	transferinsID.Write([]byte (st))
 	_transferIns, err := stub.GetState(string(transferinsID.Sum(nil)))
@@ -233,7 +233,7 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 		return false, err
 	}
 
-	reward := t.getProofOfStakeReward(stub, args[0])
+	reward, _ := t.getProofOfStakeReward(stub, args[0])
 	if reward <= 0 {
 		return false, err
 	}
@@ -258,11 +258,11 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 	temp_tin.Time = time.Now().Unix()
 
 	um = append(um, temp_tin)
-	um, err = json.Marshal(&um)
+	um_b, err = json.Marshal(&um)
 	if err != nil {
 		return false, err
 	}
-	stub.PutState(transferinsID.Sum(nil), um)
+	stub.PutState(string(transferinsID.Sum(nil)), um_b)
 
 	return true, nil
 }
@@ -274,7 +274,7 @@ func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, args 
 		return 0,false
 	}
 
-	_coinAge = getCoinAge(stub, now, args)
+	_coinAge, _ := getCoinAge(stub, now, args)
 	if _coinAge <= 0 {
 		return 0, false
 	}
