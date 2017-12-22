@@ -31,8 +31,8 @@ import (
 
 var logger = shim.NewLogger("mylogger")
 
-const oneDayUnixTime int = 86400000000000
-const oneYearUnixTime int = 31536000000000000
+const oneDayUnixTime int64 = 86400000000000
+const oneYearUnixTime int64 = 31536000000000000
 
 type AerialCC struct {
 	name string
@@ -44,7 +44,7 @@ type AerialCC struct {
 	stakeStartTime int64
 	stakeMinAge int
 	stakeMaxAge int
-	maxMineProofOfStake int
+	maxMintProofOfStake int
 
 	totalSupply int
 	maxTotalSupply int
@@ -243,9 +243,9 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 		fmt.Printf("IncreaseTotalSupply Failed: %s", err)
 		return false, err
 	}
-
-	src_str, _ := strconv.Atoi(string(src))
-	src = []byte(strconv.Itoa(src_str + reward))
+	fmt.Printf("Total Supply Increased to: %s", newTS)
+	src_integer, _ := strconv.Atoi(string(src))
+	src = []byte(strconv.Itoa(src_integer + reward))
 	err = stub.PutState(args[0], src)
 	if err != nil {
 		return false, err
@@ -254,11 +254,11 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 	um = nil
 	var temp_tin TransferInStruct
 	temp_tin.Address = args[0]
-	temp_tin.Amount = src+reward
+	temp_tin.Amount = src_integer + reward
 	temp_tin.Time = time.Now().Unix()
 
-	um = append(um, temp_tin)
-	um_b, err = json.Marshal(&um)
+	um := append(um, temp_tin)
+	um_b, err := json.Marshal(&um)
 	if err != nil {
 		return false, err
 	}
@@ -267,21 +267,21 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 	return true, nil
 }
 
-func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, args []string) (int, bool) {
+func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, address string) (int, bool) {
 
 	now := time.Now().Unix()
 	if now <= t.stakeStartTime || t.stakeStartTime <= 0 {
 		return 0,false
 	}
 
-	_coinAge, _ := getCoinAge(stub, now, args)
+	_coinAge, _ := getCoinAge(stub, now, address)
 	if _coinAge <= 0 {
 		return 0, false
 	}
 
 	var interest int
 	interest = t.maxMintProofOfStake
-	if (now - t.stakeStartTime) / oneYearUnixTime == 0 {
+	if (int64(now) - t.stakeStartTime) / oneYearUnixTime == 0 {
 		interest = (770 * t.maxMintProofOfStake) / 100
 	} else if (now - t.stakeStartTime) / oneYearUnixTime == 1 {
 		interest = (435 * maxMintProofOfStake) / 100
@@ -291,9 +291,9 @@ func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, args 
 
 }
 
-func getCoinAge(stub shim.ChaincodeStubInterface, now time, args []string) (int, bool) {
+func getCoinAge(stub shim.ChaincodeStubInterface, now time, address string) (int, bool) {
 
-	st := string(append(args[0],"transferIn"))
+	st := string(append(address,"transferIn"))
 	transferinsID := sha256.New()
 	transferinsID.Write([]byte (st))
 	transferIns, err := stub.GetState(transferinsID.Sum(nil))
