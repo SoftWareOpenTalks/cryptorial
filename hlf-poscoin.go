@@ -337,7 +337,7 @@ func (t *AerialCC) getCoinAge(stub shim.ChaincodeStubInterface, now time, addres
 		return 0, false
 	}
 
-	var _coinAge int
+	var _coinAge int64
 	for i := 0; i < len(um); i++ {
 		if now.Unix() < (um[i].Time + t.stakeMinAge){
 			continue
