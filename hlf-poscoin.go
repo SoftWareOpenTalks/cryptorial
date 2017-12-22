@@ -62,6 +62,14 @@ type TransferInStruct struct {
 
 type transferIns []TransferInStruct
 
+type aerialResponse struct {
+    // A status code that should follow the HTTP status codes.
+    Status int32 `protobuf:"varint,1,opt,name=status" json:"status,omitempty"`
+    // A message associated with the response code.
+    Message string `protobuf:"bytes,2,opt,name=message" json:"message,omitempty"`
+    // A payload that can be used to include metadata with this response.
+    Payload []byte `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+}
 
 // Called to initialize the chaincode
 
@@ -73,9 +81,14 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface) peer.Response {
 
 	logger.Info("Starting Initializing the Chaincode")
 
+	var resp aerialResponse
+
 	if len(args) < 12 {
 		logger.Error("Invalid number of arguments")
-		return nil
+		resp.Status = 1
+		resp.Message = "Invalid number of args"
+		resp.Payload = nil
+		return resp
 	}
 
 	/**
@@ -132,10 +145,19 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface) peer.Response {
 	t.totalInitialSupply = 100
 	logger.Info("Successfully Initialized the AerialCC")
 
-	return nil
+	resp.Status = 2
+	resp.Message = "Vaild everything"
+	resp.Payload = nil
+	return resp
 
 }
-
+func (t *AerialCC) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
+	var resp aerialResponse
+	resp.Status = 1
+	resp.Message = "invoked"
+	resp.Payload = nil
+	return resp
+}
 func (t *AerialCC) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	if function == "MakePayment" {
 		return MakePayment(stub, args)
@@ -298,13 +320,13 @@ func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, addre
 
 }
 
-func (t *AerialCC) getCoinAge(stub shim.ChaincodeStubInterface, now time, address string) (int, bool) {
+func (t *AerialCC) getCoinAge(stub shim.ChaincodeStubInterface, now time, address string) (int64, bool) {
 
 	st := address + "transferIn"
 	transferinsID := sha256.New()
 	transferinsID.Write([]byte (st))
 	transferIns_state, err := stub.GetState(string(transferinsID.Sum(nil)))
-	var um transferInStruct
+	var um []TransferInStruct
 	err = json.Unmarshal(transferIns_state, &um)
 
 	if err != nil {
