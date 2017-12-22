@@ -81,7 +81,7 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface) peer.Response {
 
 	logger.Info("Starting Initializing the Chaincode")
 
-	var resp aerialResponse
+	var resp peer.Response
 
 	if len(args) < 12 {
 		logger.Error("Invalid number of arguments")
@@ -152,7 +152,7 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface) peer.Response {
 
 }
 func (t *AerialCC) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
-	var resp aerialResponse
+	var resp peer.Response
 	resp.Status = 1
 	resp.Message = "invoked"
 	resp.Payload = nil
