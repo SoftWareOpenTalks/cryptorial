@@ -58,14 +58,18 @@ type TransferInStruct struct {
 	Amount int "json:amount"
 	Time int64 "json:time"
 }
+
 type transferIns []TransferInStruct
 
 
 // Called to initialize the chaincode
-func (t *AerialCC) Init(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+
+func (t *AerialCC) Init(stub shim.ChaincodeStubInterface) ([]byte, error) {
 
 	var err error
 
+	args := shim.GetStringArgs()
+	
 	logger.Info("Starting Initializing the Chaincode")
 
 	if len(args) < 12 {
@@ -276,7 +280,7 @@ func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, addre
 		return 0,false
 	}
 
-	_coinAge, _ := getCoinAge(stub, now, address)
+	_coinAge, _ := t.getCoinAge(stub, now, address)
 	if _coinAge <= 0 {
 		return 0, false
 	}
@@ -289,7 +293,7 @@ func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, addre
 		interest = (435 * t.maxMintProofOfStake) / 100
 	}
 
-	return (_coinAge * interest) / (365* (math.POW(10,t.decimals))), true
+	return (_coinAge * interest) / (365* (math.Pow(10,t.decimals))), true
 
 }
 
@@ -298,9 +302,9 @@ func (t *AerialCC) getCoinAge(stub shim.ChaincodeStubInterface, now time, addres
 	st := address + "transferIn"
 	transferinsID := sha256.New()
 	transferinsID.Write([]byte (st))
-	transferIns, err := stub.GetState(string(transferinsID.Sum(nil)))
+	transferIns_state, err := stub.GetState(string(transferinsID.Sum(nil)))
 	var um transferIns
-	err = json.Unmarshal(transferIns, &um)
+	err = json.Unmarshal(transferIns_state, &um)
 
 	if err != nil {
 		return 0, false
@@ -311,16 +315,16 @@ func (t *AerialCC) getCoinAge(stub shim.ChaincodeStubInterface, now time, addres
 	}
 
 	var _coinAge int
-	for i := 0; i < len(transferIns); i++ {
-		if now.Unix() < (transferIns[i].Time + t.stakeMinAge){
+	for i := 0; i < len(transferIns_state); i++ {
+		if now.Unix() < (transferIns_state[i].Time + t.stakeMinAge){
 			continue
 		}
-		var nCoinSeconds int
-		nCoinSeconds = now.Unix - transferIns[i].Time
+		var nCoinSeconds int64
+		nCoinSeconds = now.Unix - transferIns_state[i].Time
 		if nCoinSeconds > t.stakeMaxAge {
 			nCoinSeconds = t.stakeMaxAge
 		}
-		_coinAge = _coinAge + transferIns[i].Amount * (nCoinSeconds / 86400*(math.Pow(10,9)))
+		_coinAge = _coinAge + transferIns_state[i].Amount * (nCoinSeconds / int64(86400*(math.Pow(10,9))))
 	}
 	return _coinAge, true
 }
