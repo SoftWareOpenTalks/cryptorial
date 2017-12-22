@@ -75,8 +75,6 @@ type aerialResponse struct {
 
 func (t *AerialCC) Init(stub shim.ChaincodeStubInterface) peer.Response {
 
-	var err error
-
 	args := stub.GetStringArgs()
 
 	logger.Info("Starting Initializing the Chaincode")
