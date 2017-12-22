@@ -283,7 +283,7 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 	var um_new []TransferInStruct
 	var temp_tin TransferInStruct
 	temp_tin.Address = args[0]
-	temp_tin.Amount = src_integer + reward
+	temp_tin.Amount = int64(src_integer + reward)
 	temp_tin.Time = time.Now().Unix()
 
 	um = append(um_new, temp_tin)
@@ -316,7 +316,7 @@ func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, addre
 		interest = (435 * t.maxMintProofOfStake) / 100
 	}
 
-	return float64(_coinAge * interest) / (365* (math.Pow(10,float64(t.decimals)))), true
+	return float64(_coinAge * int64(interest)) / (365* (math.Pow(10,float64(t.decimals)))), true
 
 }
 
@@ -343,7 +343,7 @@ func (t *AerialCC) getCoinAge(stub shim.ChaincodeStubInterface, now time.Time, a
 			continue
 		}
 		var nCoinSeconds int64
-		nCoinSeconds = now.Unix - um[i].Time
+		nCoinSeconds = now.Unix() - um[i].Time
 		if nCoinSeconds > t.stakeMaxAge {
 			nCoinSeconds = t.stakeMaxAge
 		}
