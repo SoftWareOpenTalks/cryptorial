@@ -228,14 +228,14 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 	transferinsID := sha256.New()
 	transferinsID.Write([]byte (st))
 	_transferIns, err := stub.GetState(string(transferinsID.Sum(nil)))
-	var um transferIns
+	var um []TransferInStruct
 	err = json.Unmarshal(_transferIns, &um)
 
 	if err != nil {
 		return false, err
 	}
 
-	if len(_transferIns) <= 0 {
+	if len(um) <= 0 {
 		return false, err
 	}
 
@@ -258,13 +258,13 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 	}
 	fmt.Println("sup!?")
 	//um := nil
-	var um []TransferInStruct
+	var um_new []TransferInStruct
 	var temp_tin TransferInStruct
 	temp_tin.Address = args[0]
 	temp_tin.Amount = src_integer + reward
 	temp_tin.Time = time.Now().Unix()
 
-	um = append(um, temp_tin)
+	um = append(um_new, temp_tin)
 	um_b, err := json.Marshal(&um)
 	if err != nil {
 		return false, err
@@ -304,7 +304,7 @@ func (t *AerialCC) getCoinAge(stub shim.ChaincodeStubInterface, now time, addres
 	transferinsID := sha256.New()
 	transferinsID.Write([]byte (st))
 	transferIns_state, err := stub.GetState(string(transferinsID.Sum(nil)))
-	var um transferIns
+	var um transferInStruct
 	err = json.Unmarshal(transferIns_state, &um)
 
 	if err != nil {
