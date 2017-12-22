@@ -120,7 +120,7 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface, args []string) ([]byte
 
 	t.stakeMinAge = 3*oneDayUnixTime
 	t.stakeMaxAge = 90*oneDayUnixTime
-	t.maxMineProofOfStake = 100000000000000000
+	t.maxMintProofOfStake = 100000000000000000
 
 	t.totalSupply = 100
 	t.maxTotalSupply = 21000000
@@ -252,7 +252,8 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 		return false, err
 	}
 	fmt.Println("sup!?")
-	um := nil
+	//um := nil
+	var um []TransferInStruct
 	var temp_tin TransferInStruct
 	temp_tin.Address = args[0]
 	temp_tin.Amount = src_integer + reward
@@ -292,7 +293,7 @@ func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, addre
 
 }
 
-func getCoinAge(stub shim.ChaincodeStubInterface, now time, address string) (int, bool) {
+func (t *AerialCC) getCoinAge(stub shim.ChaincodeStubInterface, now time, address string) (int, bool) {
 
 	st := address + "transferIn"
 	transferinsID := sha256.New()
@@ -319,7 +320,7 @@ func getCoinAge(stub shim.ChaincodeStubInterface, now time, address string) (int
 		if nCoinSeconds > t.stakeMaxAge {
 			nCoinSeconds = t.stakeMaxAge
 		}
-		_coinAge = _coinAge + transferIns[i].Amount * (nCoinSeconds / 86400*(10**9))
+		_coinAge = _coinAge + transferIns[i].Amount * (nCoinSeconds / 86400*(math.Pow(10,9)))
 	}
 	return _coinAge, true
 }
