@@ -56,7 +56,7 @@ type AerialCC struct {
 
 type TransferInStruct struct {
 	Address string "json:address"
-	Amount int "json:amount"
+	Amount int64 "json:amount"
 	Time int64 "json:time"
 }
 
@@ -320,7 +320,7 @@ func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, addre
 
 }
 
-func (t *AerialCC) getCoinAge(stub shim.ChaincodeStubInterface, now time, address string) (int64, bool) {
+func (t *AerialCC) getCoinAge(stub shim.ChaincodeStubInterface, now time.Time, address string) (int64, bool) {
 
 	st := address + "transferIn"
 	transferinsID := sha256.New()
@@ -333,7 +333,7 @@ func (t *AerialCC) getCoinAge(stub shim.ChaincodeStubInterface, now time, addres
 		return 0, false
 	}
 
-	if len(transferIns) <= 0 {
+	if len(um) <= 0 {
 		return 0, false
 	}
 
