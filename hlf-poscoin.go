@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+	"math"
 
 	"encoding/json"
 
@@ -42,8 +43,8 @@ type AerialCC struct {
 	chainStartTime int64
 	chainStartBlockNumber int
 	stakeStartTime int64
-	stakeMinAge int
-	stakeMaxAge int
+	stakeMinAge int64
+	stakeMaxAge int64
 	maxMintProofOfStake int
 
 	totalSupply int
@@ -251,13 +252,13 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 		return false, err
 	}
 	fmt.Println("sup!?")
-	um = nil
+	um := nil
 	var temp_tin TransferInStruct
 	temp_tin.Address = args[0]
 	temp_tin.Amount = src_integer + reward
 	temp_tin.Time = time.Now().Unix()
 
-	um := append(um, temp_tin)
+	um = append(um, temp_tin)
 	um_b, err := json.Marshal(&um)
 	if err != nil {
 		return false, err
@@ -284,19 +285,19 @@ func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, addre
 	if (int64(now) - t.stakeStartTime) / oneYearUnixTime == 0 {
 		interest = (770 * t.maxMintProofOfStake) / 100
 	} else if (now - t.stakeStartTime) / oneYearUnixTime == 1 {
-		interest = (435 * maxMintProofOfStake) / 100
+		interest = (435 * t.maxMintProofOfStake) / 100
 	}
 
-	return (_coinAge * interest) / (365* (10**t.decimals)), true
+	return (_coinAge * interest) / (365* (math.POW(10,t.decimals))), true
 
 }
 
 func getCoinAge(stub shim.ChaincodeStubInterface, now time, address string) (int, bool) {
 
-	st := string(append(address,"transferIn"))
+	st := address + "transferIn"
 	transferinsID := sha256.New()
 	transferinsID.Write([]byte (st))
-	transferIns, err := stub.GetState(transferinsID.Sum(nil))
+	transferIns, err := stub.GetState(string(transferinsID.Sum(nil)))
 	var um transferIns
 	err = json.Unmarshal(transferIns, &um)
 
