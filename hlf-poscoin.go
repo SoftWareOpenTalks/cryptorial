@@ -169,7 +169,7 @@ func (t *AerialCC) Query(stub shim.ChaincodeStubInterface, function string, args
 	return nil, nil
 }
 
-func (t *AerialCC) increaseTotalSupply(stub shim.ChaincodeStubInterface, reward int) ([]byte, error) {
+func (t *AerialCC) increaseTotalSupply(stub shim.ChaincodeStubInterface, reward int64) ([]byte, error) {
 	t.totalSupply = t.totalSupply + reward
 	return nil, nil
 }
@@ -266,14 +266,14 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 		return false, err
 	}
 
-	newTS, err := t.increaseTotalSupply(stub, reward)
+	newTS, err := t.increaseTotalSupply(stub, int(reward))
 	if err != nil {
 		fmt.Printf("IncreaseTotalSupply Failed: %s", err)
 		return false, err
 	}
 	fmt.Printf("Total Supply Increased to: %s", newTS)
 	src_integer, _ := strconv.Atoi(string(src))
-	src = []byte(strconv.Itoa(src_integer + reward))
+	src = []byte(strconv.Itoa(int64(src_integer) + reward))
 	err = stub.PutState(args[0], src)
 	if err != nil {
 		return false, err
@@ -283,7 +283,7 @@ func (t *AerialCC) MinePoS(stub shim.ChaincodeStubInterface, args []string) (boo
 	var um_new []TransferInStruct
 	var temp_tin TransferInStruct
 	temp_tin.Address = args[0]
-	temp_tin.Amount = int64(src_integer + reward)
+	temp_tin.Amount = int64(int64(src_integer) + reward)
 	temp_tin.Time = time.Now().Unix()
 
 	um = append(um_new, temp_tin)
