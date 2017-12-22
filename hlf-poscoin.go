@@ -75,7 +75,7 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface) peer.Response {
 
 	if len(args) < 12 {
 		logger.Error("Invalid number of arguments")
-		return nil, errors.New("Invalid number of arguments")
+		return nil
 	}
 
 	/**
@@ -132,7 +132,7 @@ func (t *AerialCC) Init(stub shim.ChaincodeStubInterface) peer.Response {
 	t.totalInitialSupply = 100
 	logger.Info("Successfully Initialized the AerialCC")
 
-	return nil, nil
+	return nil
 
 }
 
@@ -294,7 +294,7 @@ func (t *AerialCC) getProofOfStakeReward(stub shim.ChaincodeStubInterface, addre
 		interest = (435 * t.maxMintProofOfStake) / 100
 	}
 
-	return (_coinAge * interest) / (365* (math.Pow(10,t.decimals))), true
+	return float64(_coinAge * interest) / (365* (math.Pow(10,float64(t.decimals)))), true
 
 }
 
@@ -316,16 +316,16 @@ func (t *AerialCC) getCoinAge(stub shim.ChaincodeStubInterface, now time, addres
 	}
 
 	var _coinAge int
-	for i := 0; i < len(transferIns_state); i++ {
-		if now.Unix() < (transferIns_state[i].Time + t.stakeMinAge){
+	for i := 0; i < len(um); i++ {
+		if now.Unix() < (um[i].Time + t.stakeMinAge){
 			continue
 		}
 		var nCoinSeconds int64
-		nCoinSeconds = now.Unix - transferIns_state[i].Time
+		nCoinSeconds = now.Unix - um[i].Time
 		if nCoinSeconds > t.stakeMaxAge {
 			nCoinSeconds = t.stakeMaxAge
 		}
-		_coinAge = _coinAge + transferIns_state[i].Amount * (nCoinSeconds / int64(86400*(math.Pow(10,9))))
+		_coinAge = _coinAge + um[i].Amount * (nCoinSeconds / int64(86400*(math.Pow(10,9))))
 	}
 	return _coinAge, true
 }
