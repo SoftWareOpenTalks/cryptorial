@@ -27,6 +27,7 @@ import (
 	"encoding/json"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
+	"github.com/hyperledger/fabric/protos/peer"
 	"crypto/sha256"
 )
 
@@ -64,7 +65,7 @@ type transferIns []TransferInStruct
 
 // Called to initialize the chaincode
 
-func (t *AerialCC) Init(stub shim.ChaincodeStubInterface) ([]byte, error) {
+func (t *AerialCC) Init(stub shim.ChaincodeStubInterface) peer.Response {
 
 	var err error
 
